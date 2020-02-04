@@ -11,7 +11,7 @@ class App extends React.Component {
     temp: undefined,
     city: undefined,
     country: undefined,
-    sunrise: undefined,
+    pressure: undefined,
     sunset: undefined,
     error: undefined,
   }
@@ -19,18 +19,35 @@ class App extends React.Component {
   gettingweather = async (e) => {
     e.preventDefault();
     const city = e.target.elements.city.value;
-    const api_url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`);
-    const data = await api_url.json();
-    console.log(data);
+   
 
-    this.setState({
-      temp: data.main.temp,
-      city: data.name,
-      country: data.sys.country,
-      sunrise: data.sys.sunrise,
-      sunset: data.sys.sunset,
-      error: ''
+    if (city) {
+      const api_url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`);
+      const data = await api_url.json();
+   
+      let sunset = data.sys.sunset;
+      let date = new Date();
+      date.setTime(sunset);
+      
+      let sunset_time = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+      this.setState({
+        temp: data.main.temp,
+        city: data.name,
+        country: data.sys.country,
+        pressure: data.main.pressure,
+        sunset: sunset_time,
+        error: undefined
     });
+    } else {
+      this.setState({
+        temp: undefined,
+        city: undefined,
+        country: undefined,
+        pressure: undefined,
+        sunset: undefined,
+        error: 'Enter city name'
+      });
+    }
   }
   render () {
     return (
@@ -41,7 +58,7 @@ class App extends React.Component {
         temp = {this.state.temp}
         city = {this.state.city}
         country = {this.state.country}
-        sunrise = {this.state.sunrise}
+        pressure = {this.state.pressure}
         sunset = {this.state.sunset}
         error = {this.state.error}
       />
